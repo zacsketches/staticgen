@@ -1,0 +1,36 @@
+# .github/workflows/release.yml
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'    # e.g., v1.0.0
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build
+        run: |
+          go mod tidy
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o staticgen .
+          tar -czf staticgen_${{ github.ref_name }}_linux_amd64.tar.gz staticgen
+          sha256sum staticgen_${{ github.ref_name }}_linux_amd64.tar.gz > checksums.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            staticgen_${{ github.ref_name }}_linux_amd64.tar.gz
+            checksums.txt
