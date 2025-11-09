@@ -25,12 +25,12 @@ jobs:
         run: |
           go mod tidy
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o staticgen .
-          tar -czf staticgen_${{ github.ref_name }}_linux_amd64.tar.gz staticgen
-          sha256sum staticgen_${{ github.ref_name }}_linux_amd64.tar.gz > checksums.txt
+          tar -czf staticgen_linux_amd64.tar.gz staticgen
+          sha256sum staticgen_linux_amd64.tar.gz > checksums.txt
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            staticgen_${{ github.ref_name }}_linux_amd64.tar.gz
+            staticgen_linux_amd64.tar.gz
             checksums.txt
